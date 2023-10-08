@@ -36,7 +36,7 @@ export const addFile = async (req, res) => {
       file_size,
       file_type,
       link,
-      shortlink: `http://localhost:5000/${shortID}`,
+      shortlink: `https://upload-nest-xss8.vercel.app/${shortID}`,
       shortId: shortID,
     });
 
