@@ -55,7 +55,7 @@ const Signup = () => {
         pauseOnHover: true,
       });
       setTimeout(() => {
-        navigate('/signin');
+        navigate('/');
       }, 2000);
     } catch (error) {
       toast.error('Error signing in with Google', {
@@ -91,7 +91,7 @@ const Signup = () => {
           });
 
           setTimeout(() => {
-            navigate('/signin');
+            navigate('/');
           }, 2000);
         } catch (error) {
           setLoading(false);
@@ -259,7 +259,7 @@ const Signup = () => {
           <p
             className="mt-2 text-sm text-blue-500 cursor-pointer underline"
             onClick={() => {
-              navigate('/signin');
+              navigate('/');
             }}
           >
             Already have an account? Sign here

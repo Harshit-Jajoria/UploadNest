@@ -6,16 +6,16 @@ import { verifyToken } from '../middleware/auth.js';
 const router = express.Router();
 
 /* READ */
-router.get('/file', getFiles);
+router.get('/file',verifyToken, getFiles);
 
 //Get url using short url
 router.get('/:shortId', getLink);
 
 
-router.get('/file/:userId', getFilesByUserId);
+router.get('/file/:userId',verifyToken, getFilesByUserId);
 
 /* POST */
-router.post('/add-file', addFile);
+router.post('/add-file',verifyToken, addFile);
 
 
 export default router;

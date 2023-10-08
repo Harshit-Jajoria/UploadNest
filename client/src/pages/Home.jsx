@@ -7,6 +7,18 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import uploadFile from '../firebase/uploadFile';
 
+const fileIconMapping = {
+  pdf: 'pdf.png',
+  doc: 'doc.png',
+  docx: 'doc.png',
+  xlsx: 'xlx.png',
+  jpeg: 'image.png',
+  jpg: 'image.png',
+  png: 'image.png',
+  ppt: 'ppt.png',
+  txt: 'txt.png',
+};
+
 const Home = () => {
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
@@ -14,14 +26,40 @@ const Home = () => {
 
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileValidationMessage, setFileValidationMessage] = useState('');
   const inputRef = useRef(null);
 
   const handleFileUpload = (e) => {
     const files = e.target.files; // Get the selected files
     if (files.length > 0) {
-      console.log('Uploaded Files:', files);
+      const selectedFile = files[0];
+      const allowedFileTypes = [
+        'pdf',
+        'doc',
+        'xlsx',
+        'jpeg',
+        'jpg',
+        'png',
+        'docx',
+        'ppt',
+        'txt',
+      ];
+      const maxFileSize = 10 * 1024 * 1024; // 10MB
 
-      setSelectedFiles([...selectedFiles, files[0]]);
+      if (!allowedFileTypes.includes(selectedFile.name.split('.').pop())) {
+        setFileValidationMessage(
+          'Invalid file type. Supported types: pdf, ppt,doc, docx xlsx, jpeg, jpg, png, txt.'
+        );
+        return;
+      }
+
+      if (selectedFile.size > maxFileSize) {
+        setFileValidationMessage('File size exceeds 10MB limit.');
+        return;
+      }
+
+      setSelectedFiles([selectedFile]);
+      setFileValidationMessage('');
     }
   };
 
@@ -36,27 +74,32 @@ const Home = () => {
   };
 
   const handleSubmit = async () => {
-    if (selectedFiles) {
-      const date = new Date();
-      const timestamp = date.toISOString();
-      const fileName = `picture-${timestamp}-${selectedFiles[0].name}`;
+    if (selectedFiles.length === 0) {
+      setFileValidationMessage('Please select a file.');
+      return;
+    }
 
-      try {
-        const imageUrl = await uploadFile(selectedFiles[0], fileName);
-        const res = await axios.post(`${BACKEND_URL}/add-file`, {
-          userId: user._id,
-          filename: selectedFiles[0].name,
-          file_size: selectedFiles[0].size,
-          file_type: selectedFiles[0].type,
-          link: imageUrl,
-        });
-        console.log(res.data);
+    const selectedFile = selectedFiles[0];
+    const date = new Date();
+    const timestamp = date.toISOString();
+    const fileName = `picture-${timestamp}-${selectedFile.name}`;
 
-      } catch (error) {
-        console.error('Error uploading file:', error);
-      }
-    } else {
-      console.error('No file selected.');
+    try {
+      const imageUrl = await uploadFile(selectedFile, fileName);
+      console.log(imageUrl);
+      const res = await axios.post(`${BACKEND_URL}/add-file`, {
+        userId: user._id,
+        filename: selectedFile.name,
+        file_size: selectedFile.size,
+        file_type: selectedFile.type,
+        link: imageUrl,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(res.data);
+      setSelectedFiles([]);
+    } catch (error) {
+      console.error('Error uploading file:', error);
     }
   };
 
@@ -64,21 +107,7 @@ const Home = () => {
     inputRef.current.click();
   };
 
-  const handleClick = async (item) => {
-    if (!isAuth) {
-      navigate('/signin');
-    }
-
-    try {
-      const res = await axios.get(`${BACKEND_URL}/questions/${item.text}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.data;
-      navigate('/quiz', { state: { questions: data } });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+ 
 
   return (
     <>
@@ -115,31 +144,40 @@ const Home = () => {
           />
         </div>
 
-        {selectedFiles.map((file, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg shadow-lg p-4 mx-auto mb-4 w-full max-w-xs"
-          >
+        {selectedFiles.length > 0 && (
+          <div className="bg-white rounded-lg shadow-lg p-4 mx-auto mb-4 w-full max-w-xs">
             <div className="flex items-center space-x-4">
-              <img src="/icons/ppt.png" alt="File Icon" className="w-16 h-14" />
+              <img
+                src={`/icons/${
+                  fileIconMapping[selectedFiles[0].name.split('.').pop()]
+                }`}
+                alt="File Icon"
+                className="w-16 h-14"
+              />
               <div className="text-center">
                 <div
                   className="text-xl font-medium text-gray-800"
                   style={{ maxWidth: '150px', wordWrap: 'break-word' }}
                 >
                   {/* Wrap the file name in a div */}
-                  <div>{file.name}</div>
+                  <div>{selectedFiles[0].name}</div>
                 </div>
                 <p className="text-xl text-gray-600">
-                  File Size: {formatFileSize(file.size)}
+                  File Size: {formatFileSize(selectedFiles[0].size)}
                 </p>
               </div>
             </div>
           </div>
-        ))}
+        )}
+
+        {fileValidationMessage && (
+          <p className="text-red-500 text-center text-2xl">
+            {fileValidationMessage}
+          </p>
+        )}
 
         <button
-          className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white text-2xl py-4 px-8  rounded-lg mx-auto m-4"
+          className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white text-2xl py-4 px-8 rounded-lg mx-auto m-4"
           onClick={handleSubmit}
         >
           Submit

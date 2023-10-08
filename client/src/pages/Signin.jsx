@@ -46,7 +46,7 @@ const Signin = () => {
         pauseOnHover: true,
       });
       setTimeout(() => {
-        navigate('/');
+        navigate('/home');
       }, 2000);
     } catch (error) {
       toast.error('Error signing in with Google', {
@@ -86,7 +86,7 @@ const Signin = () => {
           });
 
           setTimeout(() => {
-            navigate('/');
+            navigate('/home');
           }, 2000);
         } catch (err) {
           setLoading(false);

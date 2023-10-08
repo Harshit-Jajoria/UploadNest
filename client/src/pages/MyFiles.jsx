@@ -6,6 +6,18 @@ import { BACKEND_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
+const fileIconMapping = {
+  pdf: 'pdf.png',
+  doc: 'doc.png',
+  docx: 'doc.png',
+  xlx: 'xlsx.png',
+  jpeg: 'image.png',
+  jpg: 'image.png',
+  png: 'image.png',
+  ppt: 'ppt.png',
+  txt:'txt.png',
+};
+
 const MyFiles = () => {
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
@@ -17,7 +29,9 @@ const MyFiles = () => {
   useEffect(() => {
     const getUserFilesData = async () => {
       try {
-        const res = await axios.get(`${BACKEND_URL}/file/${user._id}`);
+        const res = await axios.get(`${BACKEND_URL}/file/${user._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         console.log(res.data);
         setUserFiles(res.data);
       } catch (error) {
@@ -25,7 +39,7 @@ const MyFiles = () => {
       }
     };
     getUserFilesData();
-  }, [user._id]);
+  }, []);
 
   // Function to copy URL to clipboard
   const copyToClipboard = (url) => {
@@ -38,51 +52,28 @@ const MyFiles = () => {
     alert('URL copied to clipboard!');
   };
 
-  // const downloadFile = () => {
-  //   const url =
-  //     'https://firebasestorage.googleapis.com/v0/b/farmart-dc925.appspot.com/o/cloud-upload-a30f385a928e44e199a62210d578375a.jpg?alt=media&token=02c6a6d9-58a4-46c7-99db-05fdb450bd48&_gl=1*149b8zj*_ga*MTQzNjY2NDUyMC4xNjk2NjY4MzA0*_ga_CW55HF8NVT*MTY5Njc2NDA2NC40LjEuMTY5Njc2NDEwMi4yMi4wLjA.';
-  //   const filename = 'pdfbrowser.png';
-  //   fetch(url)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`Network response was not ok: ${response.status}`);
-  //       }
-  //       return response.blob();
-  //     })
-  //     .then((blob) => {
-  //       const blobUrl = window.URL.createObjectURL(new Blob([blob]));
-  //       const a = document.createElement('a');
-  //       a.href = blobUrl;
-  //       a.setAttribute('download', filename);
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       a.remove();
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error downloading file:', error);
-  //     });
-  // };
-
-  
-
-  const firebaseUrl = async () => {
-    const res = await axios.get(
-      'https://firebasestorage.googleapis.com/v0/b/farmart-dc925.appspot.com/o/cloud-upload-a30f385a928e44e199a62210d578375a.jpg?alt=media&token=02c6a6d9-58a4-46c7-99db-05fdb450bd48'
-    );
-    console.log(res.data);
+  const downloadFile = (url, filename) => {
+    console.log(url, filename);
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.status}`);
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const blobUrl = window.URL.createObjectURL(new Blob([blob]));
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.setAttribute('download', filename);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch((error) => {
+        console.error('Error downloading file:', error);
+      });
   };
-
-  // const downloadFile = (url, filename) => {
-  //   const anchor = document.createElement('a');
-  //   anchor.href = url;
-  //   anchor.download = filename;
-  //   anchor.style.display = 'none';
-
-  //   document.body.appendChild(anchor);
-  //   anchor.click();
-
-  //   document.body.removeChild(anchor);
-  // };
 
   return (
     <>
@@ -96,7 +87,9 @@ const MyFiles = () => {
             >
               <div className="flex items-center space-x-4">
                 <img
-                  src="/icons/ppt.png"
+                  src={`/icons/${
+                    fileIconMapping[file.filename.split('.').pop()]
+                  }`}
                   alt="File Icon"
                   className="w-16 h-14"
                 />
@@ -147,7 +140,7 @@ const MyFiles = () => {
                 </button>
                 <button
                   onClick={() => {
-                    firebaseUrl(); // Trigger file download
+                    downloadFile(file.link, file.filename); // Trigger file download
                   }}
                   className="bg-purple-500 text-white px-4 py-2 rounded-md"
                 >
