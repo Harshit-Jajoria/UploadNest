@@ -75,6 +75,10 @@ const MyFiles = () => {
       });
   };
 
+  const handlePreview=(uri) => {
+    navigate('/preview', { state: { uri } });
+  }
+
   return (
     <>
       <Navbar />
@@ -131,9 +135,10 @@ const MyFiles = () => {
               {/* Preview and Download buttons */}
               <div className="flex justify-between mt-6">
                 <button
-                  onClick={() => {
-                    // Implement preview logic here
-                  }}
+                    onClick={() => {
+                      
+                      handlePreview(file.link)
+                    }}
                   className="bg-green-500 text-white px-4 py-2 rounded-md"
                 >
                   Preview

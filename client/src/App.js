@@ -6,6 +6,7 @@ import Signin from './pages/Signin';
 import { useSelector } from 'react-redux';
 
 import MyFiles from './pages/MyFiles';
+import Preview from './pages/Preview';
 
 const App = () => {
   const isAuth = Boolean(useSelector((state) => state.token));
@@ -17,6 +18,9 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/" />} />
           <Route path="/myfiles" element={isAuth ? <MyFiles /> : <Navigate to="/" />} />
+          <Route path="/preview" element={<Preview />} />
+
+
         </Routes>
       </BrowserRouter>
     </div>
