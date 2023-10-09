@@ -5,6 +5,8 @@ import { BACKEND_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Navbarr from '../component/Navbarr';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const fileIconMapping = {
   pdf: 'pdf.png',
@@ -50,7 +52,10 @@ const MyFiles = () => {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    alert('URL copied to clipboard!');
+    toast.success('Url Copied', {
+      position: 'bottom-right',
+      autoClose: 1000,
+    });
   };
 
   const downloadFile = (url, filename) => {
@@ -97,7 +102,9 @@ const MyFiles = () => {
             >
               <div className="flex items-center space-x-4">
                 <img
-                  src={`/icons/${fileIconMapping[file.filename.split('.').pop()]}`}
+                  src={`/icons/${
+                    fileIconMapping[file.filename.split('.').pop()]
+                  }`}
                   alt="File Icon"
                   className="w-16 h-14"
                 />
@@ -108,7 +115,9 @@ const MyFiles = () => {
                   >
                     <div>{file.filename}</div>
                   </div>
-                  <p className="text-xl text-gray-600">File Size: {file.file_size} KB</p>
+                  <p className="text-xl text-gray-600">
+                    File Size: {file.file_size} KB
+                  </p>
                 </div>
               </div>
 
@@ -152,6 +161,8 @@ const MyFiles = () => {
         </div>
       </div>
       <Footer />
+      <ToastContainer />
+
     </>
   );
 };

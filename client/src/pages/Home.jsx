@@ -6,6 +6,9 @@ import { BACKEND_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import uploadFile from '../firebase/uploadFile';
+import Spinner from '../component/Spinner';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const fileIconMapping = {
   pdf: 'pdf.png',
@@ -27,6 +30,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileValidationMessage, setFileValidationMessage] = useState('');
+  const [loading,setLoading] = useState(false)
   const inputRef = useRef(null);
 
   const handleFileUpload = (e) => {
@@ -85,6 +89,7 @@ const Home = () => {
     const fileName = `picture-${timestamp}-${selectedFile.name}`;
 
     try {
+      setLoading(true);
       const imageUrl = await uploadFile(selectedFile, fileName);
       console.log(imageUrl);
       const res = await axios.post(`${BACKEND_URL}/add-file`, {
@@ -96,7 +101,11 @@ const Home = () => {
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(res.data);
+      setLoading(false);
+          toast.success('File Uploaded Successfully You Can Check in MyFiles', {
+            position: 'top-center',
+            pauseOnHover: true,
+          });
       setSelectedFiles([]);
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -111,6 +120,7 @@ const Home = () => {
 
   return (
     <>
+    {loading && <Spinner/>}
       <Navbar />
       <div className="bg-black min-h-[81vh] flex flex-col">
         <div className="upperHero h-2/5 py-10 flex flex-col justify-center items-center">
@@ -184,6 +194,8 @@ const Home = () => {
         </button>
       </div>
       <Footer />
+      <ToastContainer />
+
     </>
   );
 };

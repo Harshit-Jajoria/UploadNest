@@ -88,7 +88,7 @@ function Navbarr({ setSearchQuery }) {
           {isAuth && name ? (
             <div className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-black md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-black">
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded  md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/home');
                 }}
@@ -96,7 +96,7 @@ function Navbarr({ setSearchQuery }) {
                 Home
               </div>
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/myfiles');
                 }}
