@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../component/Footer';
-import Navbar from '../component/Navbar';
 import axios from 'axios';
 import { BACKEND_URL } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import Navbarr from '../component/Navbarr';
 
 const fileIconMapping = {
   pdf: 'pdf.png',
@@ -15,13 +15,14 @@ const fileIconMapping = {
   jpg: 'image.png',
   png: 'image.png',
   ppt: 'ppt.png',
-  txt:'txt.png',
+  txt: 'txt.png',
 };
 
 const MyFiles = () => {
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
   const isAuth = Boolean(token);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const navigate = useNavigate();
   const [userFiles, setUserFiles] = useState([]);
@@ -39,7 +40,7 @@ const MyFiles = () => {
       }
     };
     getUserFilesData();
-  }, []);
+  }, [user._id, token]);
 
   // Function to copy URL to clipboard
   const copyToClipboard = (url) => {
@@ -75,25 +76,28 @@ const MyFiles = () => {
       });
   };
 
-  const handlePreview=(uri) => {
+  const handlePreview = (uri) => {
     navigate('/preview', { state: { uri } });
-  }
+  };
+
+  // Filter files based on search query
+  const filteredFiles = userFiles.filter((file) =>
+    file.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
-      <Navbar />
+      <Navbarr setSearchQuery={setSearchQuery} />
       <div className="bg-black min-h-[81vh]">
         <div className="grid justify-center sm:grid-cols-1 md:grid-cols-3 gap-4 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {userFiles.map((file, index) => (
+          {filteredFiles.map((file, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-lg p-6 mx-auto mb-8 w-full max-w-md"
             >
               <div className="flex items-center space-x-4">
                 <img
-                  src={`/icons/${
-                    fileIconMapping[file.filename.split('.').pop()]
-                  }`}
+                  src={`/icons/${fileIconMapping[file.filename.split('.').pop()]}`}
                   alt="File Icon"
                   className="w-16 h-14"
                 />
@@ -102,29 +106,22 @@ const MyFiles = () => {
                     className="text-2xl font-medium text-gray-800"
                     style={{ maxWidth: '200px', wordWrap: 'break-word' }}
                   >
-                    {/* Wrap the file name in a div */}
                     <div>{file.filename}</div>
                   </div>
-                  <p className="text-xl text-gray-600">
-                    File Size: {file.file_size} KB
-                  </p>
+                  <p className="text-xl text-gray-600">File Size: {file.file_size} KB</p>
                 </div>
               </div>
 
-              {/* Shortlink and actions */}
               <div className="flex items-center justify-between mt-6">
-                {/* Shortlink */}
                 <div className="flex items-center space-x-2">
                   <div className="bg-gray-200 p-3 rounded-lg">
-                    {/* Shortlink goes here */}
                     <span>{file.shortlink}</span>
                   </div>
                 </div>
 
-                {/* Copy URL icon */}
                 <button
                   onClick={() => {
-                    copyToClipboard(file.shortlink); // Copy the URL when clicked
+                    copyToClipboard(file.shortlink);
                   }}
                   className="bg-blue-500 text-white ml-4 px-4 py-2 rounded-md"
                 >
@@ -132,20 +129,18 @@ const MyFiles = () => {
                 </button>
               </div>
 
-              {/* Preview and Download buttons */}
               <div className="flex justify-between mt-6">
                 <button
-                    onClick={() => {
-                      
-                      handlePreview(file.link)
-                    }}
+                  onClick={() => {
+                    handlePreview(file.link);
+                  }}
                   className="bg-green-500 text-white px-4 py-2 rounded-md"
                 >
                   Preview
                 </button>
                 <button
                   onClick={() => {
-                    downloadFile(file.link, file.filename); // Trigger file download
+                    downloadFile(file.link, file.filename);
                   }}
                   className="bg-purple-500 text-white px-4 py-2 rounded-md"
                 >

@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setLogout } from '../state';
 
-function Navbar() {
+function Navbarr({ setSearchQuery }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
+  const [query, setQuery] = useState('');
   const isAuth = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
   const name = user?.name;
-  const role = user?.role;
 
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
@@ -22,7 +22,13 @@ function Navbar() {
     setShowLogoutDropdown(!showLogoutDropdown);
   };
 
-  const isFaculty = role === 'faculty'; // Check if the role is 'faculty'
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
+    setSearchQuery(e.target.value);
+  };
+
+  
 
   return (
     <nav className="bg-black">
@@ -34,8 +40,20 @@ function Navbar() {
             alt="Flowbite Logo"
           />
           <span className="self-center text-4xl font-semibold whitespace-nowrap text-white">
-          UploadNest
+            UploadNest
           </span>
+        </div>
+        <div className="md:block">
+          <div className="flex">
+            <input
+              type="text"
+              className="w-60 px-4 py-2 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:ring focus:border-blue-500"
+              placeholder="Search..."
+              value={query}
+              onChange={handleSearchChange}
+            />
+            
+          </div>
         </div>
         <button
           onClick={toggleNavbar}
@@ -70,7 +88,7 @@ function Navbar() {
           {isAuth && name ? (
             <div className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-black md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-black">
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4  rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/home');
                 }}
@@ -78,7 +96,7 @@ function Navbar() {
                 Home
               </div>
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4  rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/myfiles');
                 }}
@@ -86,13 +104,12 @@ function Navbar() {
                 My Files
               </div>
 
-             
               <div className="relative">
                 <button
                   className="text-2xl pt-0.5 pb-1 px-4 rounded-lg bg-gradient-to-r from-blue-100 via-blue-300 to-blue-500"
                   onClick={handleUserNameClick}
                 >
-                  {name} {/* Display the user's name */}
+                  {name}
                   <svg
                     className="w-5 h-5 inline-block ml-1 cursor-pointer"
                     fill="none"
@@ -124,7 +141,7 @@ function Navbar() {
           ) : (
             <div className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-black md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-black">
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4  rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/');
                 }}
@@ -132,7 +149,7 @@ function Navbar() {
                 Home
               </div>
               <div
-                className="cursor-pointer text-2xl block py-3 pl-3 pr-4  rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-white"
+                className="cursor-pointer text-2xl block py-3 pl-3 pr-4 rounded hover:bg-gray-100 md:hover-bg-transparent md:border-0 md:hover-text-blue-700 md:p-0 text-white"
                 onClick={() => {
                   navigate('/myfiles');
                 }}
@@ -154,4 +171,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default Navbarr;
